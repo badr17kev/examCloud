@@ -1,0 +1,35 @@
+services:
+  # 1. The Database
+  mongo:
+    image: mongo:latest
+    volumes:
+      - mongo_data:/data/db
+    ports:
+      - "27017:27017"
+
+  # 2. The Backend
+  backend:
+    build: ./backend
+    env_file:
+      - .env
+    depends_on:
+      - mongo
+
+  # 3. The Frontend
+  frontend:
+    build: ./frontend
+    depends_on:
+      - backend
+
+  # 4. NGINX (The Traffic Cop linking them)
+  nginx:
+    build: ./nginx
+    ports:
+      - "8080:80"
+    depends_on:
+      - frontend
+      - backend
+
+# Define the volume for MongoDB to keep data safe
+volumes:
+  mongo_data:
